@@ -29,15 +29,36 @@ function addTextarea() {
     .fill()
     .map(() => ({}))
 
-  ratedQuestions.forEach((reatedQuestion, index) => {
+  ratedQuestions.forEach((ratedQuestion, index) => {
+    const questionState = state[index]
     const textArea = document.createElement('textarea')
     textArea.style.cssText = 'width:100%; height:6em;'
+
+    setCommentOnKeyUp(textArea, questionState)
+    setQuestion(questionState, ratedQuestion)
+    setScoreOnSelection(questionState, ratedQuestion)
+    ratedQuestion.appendChild(textArea)
+  })
+
+  function setCommentOnKeyUp(textArea, questionState) {
     textArea.onkeyup = e => {
       const comment = e.target.value
-      state[index].comment = comment
+      questionState.comment = comment
     }
-    reatedQuestion.appendChild(textArea)
-  })
+  }
+
+  function setQuestion(questionState, ratedQuestion) {
+    questionState.question = ratedQuestion.querySelector('.rich-text-view').innerText
+  }
+
+  function setScoreOnSelection(questionState, ratedQuestion) {
+    Array.from(ratedQuestion.querySelectorAll('li')).forEach((li, index) => {
+      li.onclick = () => {
+        questionState.score = index + 1
+      }
+    })
+    questionState.value
+  }
 }
 
 function disableRichTextArea() {
