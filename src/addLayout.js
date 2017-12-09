@@ -23,9 +23,19 @@ function addTextarea() {
     document.querySelectorAll('.feedback-provide-sections-section')
   ).filter(el => el.querySelector('section-rated-question'))
 
-  ratedQuestions.forEach(reatedQuestion => {
+  // questions 2 5 5
+
+  const state = Array(12)
+    .fill()
+    .map(() => ({}))
+
+  ratedQuestions.forEach((reatedQuestion, index) => {
     const textArea = document.createElement('textarea')
     textArea.style.cssText = 'width:100%; height:6em;'
+    textArea.onkeyup = e => {
+      const comment = e.target.value
+      state[index].comment = comment
+    }
     reatedQuestion.appendChild(textArea)
   })
 }
@@ -50,3 +60,5 @@ debug()
 // console.log(document.querySelectorAll('.ql-editor'))
 
 // data 2 5 5 0 0
+
+const state = [[{ question: '', score: null, comment: '' }, { value: null, comment: '' }], [1], [1]]
