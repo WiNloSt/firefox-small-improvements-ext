@@ -18,7 +18,7 @@ var observer = new MutationObserver(callback)
 observer.observe(targetNode, config)
 console.log('done!!!')
 
-function debug() {
+function addTextarea() {
   const ratedQuestions = Array.from(
     document.querySelectorAll('.feedback-provide-sections-section')
   ).filter(el => el.querySelector('section-rated-question'))
@@ -29,6 +29,24 @@ function debug() {
     reatedQuestion.appendChild(textArea)
   })
 }
+
+function disableRichTextArea() {
+  Array.from(document.querySelectorAll('.ui-rte-container'))
+    .slice(0, -2)
+    .forEach(richTextArea => {
+      richTextArea.classList.add('disabledButton')
+      richTextArea.style.cssText = 'pointer-events: none;'
+      richTextArea.querySelector('.ql-editor').style.cssText = 'pointer-events: none;'
+    })
+}
+
+function debug() {
+  addTextarea()
+  disableRichTextArea()
+}
+
 debug()
 
 // console.log(document.querySelectorAll('.ql-editor'))
+
+// data 2 5 5 0 0
