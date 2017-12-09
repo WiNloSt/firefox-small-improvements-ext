@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "Small-improvements enhancer",
+  "version": "1.0",
+
+  "description": "Help ease writing review in small improvements",
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.small-improvements.com/app/feedback/provide/*"],
+      "js": ["src/addLayout.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "applications": {
+    "gecko": {
+      "id": "small-improvements@ext.com"
+    }
+  }
+}
