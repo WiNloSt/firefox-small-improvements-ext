@@ -24,13 +24,16 @@ function addTextarea() {
   ).filter(el => el.querySelector('section-rated-question'))
 
   // questions 2 5 5
-
-  const state = Array(12)
-    .fill()
-    .map(() => ({}))
+  const state = Array(12).fill()
 
   ratedQuestions.forEach((ratedQuestion, index) => {
-    const questionState = state[index]
+    const handler = {
+      set(obj, prop, value) {
+        obj[prop] = value
+        calculateSummary()
+      }
+    }
+    const questionState = (state[index] = new Proxy({}, handler))
     const textArea = document.createElement('textarea')
     textArea.style.cssText = 'width:100%; height:6em;'
 
@@ -58,6 +61,16 @@ function addTextarea() {
       }
     })
     questionState.value
+  }
+
+  function calculateSummary() {
+    const firstSection = state.slice(0, 2)
+    const secondSection = state.slice(2, 7)
+    const thirdSection = state.slice(7, 12)
+
+    console.log(firstSection[0].score, firstSection[0].question, firstSection[0].comment)
+    console.log(secondSection)
+    console.log(thirdSection)
   }
 }
 
