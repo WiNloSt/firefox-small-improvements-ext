@@ -1,47 +1,55 @@
-console.log('run')
+try {
+  console.log('run')
 
-// Select the node that will be observed for mutations
-var targetNode = document.querySelector('#spa-router-root > [data-reactroot] > div')
+  // Select the node that will be observed for mutations
+  var targetNode = document.querySelector('#spa-router-root > [data-reactroot] > div')
 
-var config = { childList: true }
+  var config = { childList: true }
 
-var callback = function(mutationsList) {
-  for (var mutation of mutationsList) {
-    if (mutation.type == 'childList') {
-      debug()
+  var callback = function(mutationsList) {
+    for (var mutation of mutationsList) {
+      if (mutation.type == 'childList') {
+        debug()
+      }
     }
   }
-}
 
-var observer = new MutationObserver(callback)
+  var observer = new MutationObserver(callback)
 
-observer.observe(targetNode, config)
-console.log('done!!!')
-
-function addTextarea() {
-  const ratedQuestions = Array.from(
-    document.querySelectorAll('.feedback-provide-sections-section')
-  ).filter(el => el.querySelector('section-rated-question'))
+  observer.observe(targetNode, config)
+  console.log('done!!!')
 
   // questions 2 5 5
   const state = Array(12).fill()
 
-  ratedQuestions.forEach((ratedQuestion, index) => {
-    const handler = {
-      set(obj, prop, value) {
-        obj[prop] = value
-        calculateSummary()
-      }
-    }
-    const questionState = (state[index] = new Proxy({}, handler))
-    const textArea = document.createElement('textarea')
-    textArea.style.cssText = 'width:100%; height:6em;'
+  function addTextarea() {
+    const ratedQuestions = Array.from(
+      document.querySelectorAll('.feedback-provide-sections-section')
+    ).filter(el => el.querySelector('section-rated-question'))
 
-    setCommentOnKeyUp(textArea, questionState)
-    setQuestion(questionState, ratedQuestion)
-    setScoreOnSelection(questionState, ratedQuestion)
-    ratedQuestion.appendChild(textArea)
-  })
+    ratedQuestions.forEach((ratedQuestion, index) => {
+      const handler = {
+        set(obj, prop, value) {
+          obj[prop] = value
+          if (prop === 'comment' || prop === 'score') {
+            calculateSummaryAll()
+          }
+        }
+      }
+      state[index] = new Proxy({}, handler)
+    })
+
+    ratedQuestions.forEach((ratedQuestion, index) => {
+      const questionState = state[index]
+      const textArea = document.createElement('textarea')
+      textArea.style.cssText = 'width:100%; height:6em;'
+
+      setCommentOnKeyUp(textArea, questionState)
+      setQuestion(questionState, ratedQuestion)
+      setScoreOnSelection(questionState, ratedQuestion)
+      ratedQuestion.appendChild(textArea)
+    })
+  }
 
   function setCommentOnKeyUp(textArea, questionState) {
     textArea.onkeyup = e => {
@@ -63,36 +71,67 @@ function addTextarea() {
     questionState.value
   }
 
-  function calculateSummary() {
+  function calculateSummaryAll() {
     const firstSection = state.slice(0, 2)
     const secondSection = state.slice(2, 7)
     const thirdSection = state.slice(7, 12)
-
-    console.log(firstSection[0].score, firstSection[0].question, firstSection[0].comment)
-    console.log(secondSection)
-    console.log(thirdSection)
+    const richTextAreas = getRichTextAreaList()
+    clearRichTextArea()
+    calculateSummary(firstSection).forEach(p =>
+      richTextAreas[0].querySelector('.ql-editor').appendChild(p)
+    )
   }
-}
 
-function disableRichTextArea() {
-  Array.from(document.querySelectorAll('.ui-rte-container'))
-    .slice(0, -2)
-    .forEach(richTextArea => {
+  function clearRichTextArea() {
+    getRichTextAreaList()
+      .map(textArea => textArea.querySelector('.ql-editor'))
+      .forEach(editor => {
+        while (editor.firstChild) {
+          editor.removeChild(editor.firstChild)
+        }
+      })
+  }
+
+  function calculateSummary(partialState) {
+    return partialState
+      .map(calculateAnswerText)
+      .filter(hasValue)
+      .map(wrapInParagraph)
+  }
+
+  function calculateAnswerText(partialState) {
+    return partialState.score && partialState.comment
+      ? `${partialState.question}: ${partialState.score} -> ${partialState.comment}`
+      : null
+  }
+  function hasValue(a) {
+    return a
+  }
+
+  function wrapInParagraph(text) {
+    const p = document.createElement('p')
+    p.append(text)
+    return p
+  }
+
+  function disableRichTextArea() {
+    getRichTextAreaList().forEach(richTextArea => {
       richTextArea.classList.add('disabledButton')
       richTextArea.style.cssText = 'pointer-events: none;'
       richTextArea.querySelector('.ql-editor').style.cssText = 'pointer-events: none;'
     })
+  }
+
+  function getRichTextAreaList() {
+    return Array.from(document.querySelectorAll('.ui-rte-container')).slice(0, -2)
+  }
+
+  function debug() {
+    addTextarea()
+    disableRichTextArea()
+  }
+
+  debug()
+} catch (e) {
+  console.error(e)
 }
-
-function debug() {
-  addTextarea()
-  disableRichTextArea()
-}
-
-debug()
-
-// console.log(document.querySelectorAll('.ql-editor'))
-
-// data 2 5 5 0 0
-
-const state = [[{ question: '', score: null, comment: '' }, { value: null, comment: '' }], [1], [1]]
