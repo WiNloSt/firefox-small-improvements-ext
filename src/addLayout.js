@@ -27,28 +27,35 @@ try {
       document.querySelectorAll('.feedback-provide-sections-section')
     ).filter(el => el.querySelector('section-rated-question'))
 
-    ratedQuestions.forEach((ratedQuestion, index) => {
-      const handler = {
-        set(obj, prop, value) {
-          obj[prop] = value
-          if (prop === 'comment' || prop === 'score') {
-            calculateSummaryAll()
+    initState()
+    addTextAreaAndSetupHandlers()
+
+    function initState() {
+      ratedQuestions.forEach((ratedQuestion, index) => {
+        const handler = {
+          set(obj, prop, value) {
+            obj[prop] = value
+            if (prop === 'comment' || prop === 'score') {
+              calculateSummaryAll()
+            }
           }
         }
-      }
-      state[index] = new Proxy({}, handler)
-    })
+        state[index] = new Proxy({}, handler)
+      })
+    }
 
-    ratedQuestions.forEach((ratedQuestion, index) => {
-      const questionState = state[index]
-      const textArea = document.createElement('textarea')
-      textArea.style.cssText = 'width:100%; height:6em;'
-
-      setCommentOnKeyUp(textArea, questionState)
-      setQuestion(questionState, ratedQuestion)
-      setScoreOnSelection(questionState, ratedQuestion)
-      ratedQuestion.appendChild(textArea)
-    })
+    function addTextAreaAndSetupHandlers() {
+      ratedQuestions.forEach((ratedQuestion, index) => {
+        const questionState = state[index]
+        const textArea = document.createElement('textarea')
+        textArea.style.cssText = 'width:100%; height:6em;'
+        
+        setCommentOnKeyUp(textArea, questionState)
+        setQuestion(questionState, ratedQuestion)
+        setScoreOnSelection(questionState, ratedQuestion)
+        ratedQuestion.appendChild(textArea)
+      })
+    }
   }
 
   function setCommentOnKeyUp(textArea, questionState) {
@@ -110,7 +117,7 @@ try {
       ? `${partialState.question}: ${partialState.score} → ${partialState.comment}`
       : null
   }
-  
+
   function hasValue(a) {
     return a
   }
