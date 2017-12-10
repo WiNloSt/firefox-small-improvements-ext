@@ -36,7 +36,7 @@ try {
     ratedQuestions.forEach((ratedQuestion, index) => {
       const checkedRadioButton = ratedQuestion.querySelector('li > input:checked')
 
-      state[index] = { score: checkedRadioButton && checkedRadioButton.value }
+      state[index] = { score: checkedRadioButton && checkedRadioButton.value + 1 }
     })
   }
 
