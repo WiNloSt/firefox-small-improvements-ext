@@ -26,50 +26,67 @@ try {
     const ratedQuestions = Array.from(
       document.querySelectorAll('.feedback-provide-sections-section')
     ).filter(el => el.querySelector('section-rated-question'))
-
-    initState()
-    addTextAreaAndSetupHandlers()
-    initTextAreaState()
-
-    function initState() {
-      ratedQuestions.forEach((ratedQuestion, index) => {
-        const handler = {
-          set(obj, prop, value) {
-            obj[prop] = value
-            if (prop === 'comment' || prop === 'score') {
-              calculateSummaryAll()
-            }
-          }
-        }
-
-        const checkedRadioButton = ratedQuestion.querySelector('li > input:checked')
-
-        state[index] = new Proxy({ score: checkedRadioButton && checkedRadioButton.value }, handler)
-      })
-    }
-
-    function addTextAreaAndSetupHandlers() {
-      ratedQuestions.forEach((ratedQuestion, index) => {
-        const questionState = state[index]
-        const textArea = document.createElement('textarea')
-        textArea.style.cssText = 'width:100%; height:6em;'
-
-        setCommentOnKeyUp(textArea, questionState)
-        setQuestion(questionState, ratedQuestion)
-        setScoreOnSelection(questionState, ratedQuestion)
-        ratedQuestion.appendChild(textArea)
-      })
-    }
+    initState(ratedQuestions)
+    initTextAreaState(ratedQuestions)
+    initStateProxy()
+    addTextAreaAndSetupHandlers(ratedQuestions)
   }
 
-  function initTextAreaState() {
+  function initState(ratedQuestions) {
+    ratedQuestions.forEach((ratedQuestion, index) => {
+      const checkedRadioButton = ratedQuestion.querySelector('li > input:checked')
+
+      state[index] = { score: checkedRadioButton && checkedRadioButton.value }
+    })
+  }
+
+  function addTextAreaAndSetupHandlers(ratedQuestions) {
+    ratedQuestions.forEach((ratedQuestion, index) => {
+      const questionState = state[index]
+      const textArea = document.createElement('textarea')
+      textArea.value = state[index].comment || ''
+      textArea.style.cssText = 'width:100%; height:6em;'
+
+      setCommentOnKeyUp(textArea, questionState)
+      setQuestion(questionState, ratedQuestion)
+      setScoreOnSelection(questionState, ratedQuestion)
+      ratedQuestion.appendChild(textArea)
+    })
+  }
+
+  function initTextAreaState(ratedQuestions) {
     const comments = flatMap(getRichTextAreaList(), richTextArea =>
       Array.from(richTextArea.querySelectorAll('p'))
         .map(p => p.innerText)
         .filter(comment => comment.indexOf('→') > -1)
         .map(comment => /(.+):.*→ (.+)/.exec(comment).slice(1))
     )
-    console.log(comments)
+
+    comments.forEach(comment => {
+      ratedQuestions.some((ratedQuestion, index) => {
+        const questionText = getQuestionText(ratedQuestion)
+        const [questionTextFromRichTextArea, commentText] = comment
+        if (questionTextFromRichTextArea === questionText) {
+          state[index].comment = commentText
+          return true
+        }
+      })
+    })
+  }
+
+  function initStateProxy() {
+    const handler = {
+      set(obj, prop, value) {
+        obj[prop] = value
+        if (prop === 'comment' || prop === 'score') {
+          calculateSummaryAll()
+        }
+      }
+    }
+
+    state.forEach((_, index) => {
+      state[index] = new Proxy(state[index] || {}, handler)
+    })
   }
 
   function flatMap(map, fun) {
@@ -84,7 +101,11 @@ try {
   }
 
   function setQuestion(questionState, ratedQuestion) {
-    questionState.question = ratedQuestion.querySelector('.rich-text-view').innerText
+    questionState.question = getQuestionText(ratedQuestion)
+  }
+
+  function getQuestionText(ratedQuestion) {
+    return ratedQuestion.querySelector('.rich-text-view').innerText
   }
 
   function setScoreOnSelection(questionState, ratedQuestion) {
@@ -162,8 +183,6 @@ try {
     addTextArea()
     disableRichTextArea()
   }
-
-  startScript()
 } catch (e) {
   console.error(e)
 }
