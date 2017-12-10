@@ -40,7 +40,10 @@ try {
             }
           }
         }
-        state[index] = new Proxy({}, handler)
+
+        const checkedRadioButton = ratedQuestion.querySelector('li > input:checked')
+
+        state[index] = new Proxy({ score: checkedRadioButton && checkedRadioButton.value }, handler)
       })
     }
 
