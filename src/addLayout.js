@@ -9,7 +9,7 @@ try {
   var callback = function(mutationsList) {
     for (var mutation of mutationsList) {
       if (mutation.type == 'childList') {
-        debug()
+        startScript()
       }
     }
   }
@@ -110,6 +110,7 @@ try {
       ? `${partialState.question}: ${partialState.score} → ${partialState.comment}`
       : null
   }
+  
   function hasValue(a) {
     return a
   }
@@ -132,12 +133,12 @@ try {
     return Array.from(document.querySelectorAll('.ui-rte-container')).slice(0, -2)
   }
 
-  function debug() {
+  function startScript() {
     addTextarea()
     disableRichTextArea()
   }
 
-  debug()
+  startScript()
 } catch (e) {
   console.error(e)
 }
