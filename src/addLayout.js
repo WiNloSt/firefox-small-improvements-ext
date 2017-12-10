@@ -77,9 +77,9 @@ try {
     const thirdSection = state.slice(7, 12)
     const richTextAreas = getRichTextAreaList()
     clearRichTextArea()
-    calculateSummary(firstSection).forEach(p =>
-      richTextAreas[0].querySelector('.ql-editor').appendChild(p)
-    )
+    calculateSummarySection(firstSection, richTextAreas[0])
+    calculateSummarySection(secondSection, richTextAreas[1])
+    calculateSummarySection(thirdSection, richTextAreas[2])
   }
 
   function clearRichTextArea() {
@@ -90,6 +90,12 @@ try {
           editor.removeChild(editor.firstChild)
         }
       })
+  }
+
+  function calculateSummarySection(partialState, richTextArea) {
+    return calculateSummary(partialState).forEach(p =>
+      richTextArea.querySelector('.ql-editor').appendChild(p)
+    )
   }
 
   function calculateSummary(partialState) {
