@@ -22,7 +22,7 @@ try {
   // questions 2 5 5
   const state = Array(12).fill()
 
-  function addTextarea() {
+  function addTextArea() {
     const ratedQuestions = Array.from(
       document.querySelectorAll('.feedback-provide-sections-section')
     ).filter(el => el.querySelector('section-rated-question'))
@@ -49,7 +49,7 @@ try {
         const questionState = state[index]
         const textArea = document.createElement('textarea')
         textArea.style.cssText = 'width:100%; height:6em;'
-        
+
         setCommentOnKeyUp(textArea, questionState)
         setQuestion(questionState, ratedQuestion)
         setScoreOnSelection(questionState, ratedQuestion)
@@ -141,7 +141,7 @@ try {
   }
 
   function startScript() {
-    addTextarea()
+    addTextArea()
     disableRichTextArea()
   }
 
