@@ -29,6 +29,7 @@ try {
 
     initState()
     addTextAreaAndSetupHandlers()
+    initTextAreaState()
 
     function initState() {
       ratedQuestions.forEach((ratedQuestion, index) => {
@@ -59,6 +60,20 @@ try {
         ratedQuestion.appendChild(textArea)
       })
     }
+  }
+
+  function initTextAreaState() {
+    const comments = flatMap(getRichTextAreaList(), richTextArea =>
+      Array.from(richTextArea.querySelectorAll('p'))
+        .map(p => p.innerText)
+        .filter(comment => comment.indexOf('→') > -1)
+        .map(comment => /(.+):.*→ (.+)/.exec(comment).slice(1))
+    )
+    console.log(comments)
+  }
+
+  function flatMap(map, fun) {
+    return map.map(fun).reduce((a, b) => a.concat(b), [])
   }
 
   function setCommentOnKeyUp(textArea, questionState) {
