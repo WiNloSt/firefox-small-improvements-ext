@@ -107,7 +107,7 @@ try {
 
   function calculateAnswerText(partialState) {
     return partialState.score && partialState.comment
-      ? `${partialState.question}: ${partialState.score} -> ${partialState.comment}`
+      ? `${partialState.question}: ${partialState.score} → ${partialState.comment}`
       : null
   }
   function hasValue(a) {
