@@ -8,7 +8,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.small-improvements.com/app/feedback/provide/*"],
-      "js": ["src/addLayout.js"],
+      "js": ["main.js"],
       "run_at": "document_end"
     }
   ],
