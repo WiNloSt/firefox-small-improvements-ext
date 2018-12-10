@@ -105,7 +105,7 @@ try {
   }
 
   function getQuestionText(ratedQuestion) {
-    return ratedQuestion.querySelector('.rich-text-view').innerText
+    return ratedQuestion.querySelector('.rich-text-view').innerText.replace(/\n/g, '')
   }
 
   function setScoreOnSelection(questionState, ratedQuestion) {
